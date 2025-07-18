@@ -93,7 +93,7 @@
 
 ; Test to determine whether the interpreter he is faced with is using
 ; applicative-order evaluation or normal-order evaluation
-(: test (-> Number Atom Atom))
+(: test (-> Number Atom Number))
 (= (p) (p))
 (= (test $x $y)
     (if (== $x 0)
