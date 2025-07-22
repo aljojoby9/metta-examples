@@ -126,24 +126,24 @@
 
 (= (better_make-rat $n $d)
     (let $g (gcd $n $d)
-        (if (or (< $n 0) (< $d 0))
-            (make-pair (/ $n $g) (Abs (/ $d $g)))
-            (make-pair (/ $n $g) (/ $d $g)))))
+        (if (> (* $n $d) 0)
+            (make-pair (/ $n $g) (/ $d $g))
+            (make-pair (* -1.0 (Abs (/ $n $g))) (Abs (/ $d $g))))))
 
 !(assertEqual
-    (get-rat (better_make-rat 1 2))
+    (get-rat (better_make-rat 1.0 2.0))
     (1.0 / 2.0))
 
 !(assertEqual
-    (get-rat (better_make-rat -1 2))
+    (get-rat (better_make-rat -1.0 2.0))
     (-1.0 / 2.0))
 
 !(assertEqual
-    (get-rat (better_make-rat 1 -2))
+    (get-rat (better_make-rat 1.0 -2.0))
     (-1.0 / 2.0))
 
 !(assertEqual
-    (get-rat (better_make-rat -1 -2))
+    (get-rat (better_make-rat -1.0 -2.0))
     (1.0 / 2.0))
 
 
@@ -187,7 +187,7 @@
         ($xe (x-point (end-segment $seg)))
         ($ye (y-point (end-segment $seg)))
     )
-    (make-point (/ (+ $xs $xe) 2) (/ (+ $ys $ye) 2))))
+    (make-point (/ (+ $xs $xe) 2.0) (/ (+ $ys $ye) 2.0))))
 
 !(assertEqual
     (midpoint-segment (make-segment (make-point 1 2) (make-point 5 7)))
@@ -307,7 +307,7 @@
 
 (: lambda1 (-> Variable Atom (-> $a $t)))
 (= ((lambda1 $var $body) $val)
-    (let (quote ($v $b)) (sealed ($var) (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
+    (let (quote ($v $b)) (sealed () (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
 
 (= (cons $x $y)
   (let $dispatch (lambda1 $m
@@ -344,7 +344,7 @@
 
 (: lambda2 (-> Variable Variable Atom (-> $a $b $t)))
 (= ((lambda2 $var1 $var2 $body) $val1 $val2)
-    (let (quote ($v1 $v2 $b)) (sealed ($var1 $var2) (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
+    (let (quote ($v1 $v2 $b)) (sealed () (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
 
 (= (cons2 $x $y)
   (lambda1 $m ($m $x $y)))
@@ -395,7 +395,7 @@
 
 (: lambda3 (-> Variable Variable Variable Atom (-> $a $b $c $t)))
 (= ((lambda3 $var1 $var2 $var3 $body) $val1 $val2 $val3)
-    (let (quote ($v1 $v2 $v3 $b)) (sealed ($var1 $var2 $var3) (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
+    (let (quote ($v1 $v2 $v3 $b)) (sealed () (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
 
 (= (inc $x) (+ $x 1))
 
@@ -710,7 +710,7 @@
 ; selector is the same as the one shown above.
 
 (= (make-center-percent $mid $percent-deviance)
-    (let $dev (* (/ $percent-deviance 100) $mid)
+    (let $dev (* (/ $percent-deviance 100.0) $mid)
         (make-interval (- $mid $dev) (+ $mid $dev))))
 
 !(assertEqual

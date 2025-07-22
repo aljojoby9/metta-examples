@@ -7,17 +7,18 @@
 
 (: lambda1 (-> Variable Atom (-> $a $t)))
 (= ((lambda1 $var $body) $val)
-    (let (quote ($v $b)) (sealed ($var) (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
+    (let (quote ($v $b)) (sealed () (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
 
 ; For lambda with two inputs
+(: lambda2 (-> Variable Variable Atom (-> $a $b $t)))
 (= ((lambda2 $var1 $var2 $body) $val1 $val2)
-    (let (quote ($v1 $v2 $b)) (sealed ($var1 $var2) (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
+    (let (quote ($v1 $v2 $b)) (sealed () (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
 
 ; For lambda with three inputs. But actually we will use it to bypass recursive limitation while
 ; defining function using let
 (: lambda3 (-> Variable Variable Variable Atom (-> $a $b $c $t)))
 (= ((lambda3 $var1 $var2 $var3 $body) $val1 $val2 $val3)
-    (let (quote ($v1 $v2 $v3 $b)) (sealed ($var1 $var2 $var3) (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
+    (let (quote ($v1 $v2 $v3 $b)) (sealed () (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
 
 (= (sqr $x) (* $x $x))
 
@@ -56,10 +57,10 @@
     (fixed-point sqr 0.5)
     0.00390625)
 
-(= (average $a $b) (/ (+ $a $b) 2))
+(= (average $a $b) (/ (+ $a $b) 2.0))
 ; Sqrt approximation using fixed-point function
 !(assertEqual
-    (fixed-point (lambda1 $y (average $y (/ 2 $y))) 1)
+    (fixed-point (lambda1 $y (average $y (/ 2.0 $y))) 1)
     1.4166666666666665)
 
 ; Exercise 1.35.
@@ -68,7 +69,7 @@
 ; transformation x ->  1 + 1/x, and use this fact to compute by means of the fixed-point procedure.
 
 !(assertEqual
-    (fixed-point (lambda1 $x (inc (/ 1 $x))) 1)
+    (fixed-point (lambda1 $x (inc (/ 1.0 $x))) 1)
     1.6)
 
 ; -----------------------End of Exercise 1.35----------------------------
@@ -202,9 +203,9 @@
 
 (= (closest_pow2 $x)
   (let $iter (lambda3 $y $counter $self
-    (if (< (/ $y 2) 1)
+    (if (< (/ $y 2.0) 1)
         $counter
-        ($self (/ $y 2) (inc $counter) $self)))
+        ($self (/ $y 2.0) (inc $counter) $self)))
   ($iter $x 0 $iter)))
 
 !(assertEqual
@@ -229,12 +230,9 @@
                             (repeated_f average-damp (closest_pow2 $n))
                             1))
 
-; FIXME: currently not working for some reason.
-;!(assertEqual
-;    (n_root 5 8)
-;    1.5170557601762498)
-; Though this one works:
-;!(((repeated_f average-damp (closest_pow2 5)) (lambda1 $y (/ 8 (rpow $y (dec 5))))) 1.510537941965884)
+!(assertEqual
+    (n_root 5 8)
+    1.5170557601762498)
 
 ; -----------------------End of Exercise 1.45----------------------------
 

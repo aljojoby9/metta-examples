@@ -18,8 +18,7 @@
 ; Needed for putting lambda functions as input to functions
 (: lambda1 (-> Variable Atom (-> $a $t)))
 (= ((lambda1 $var $body) $val)
-    (let (quote ($v $b)) (sealed ($var) (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
-
+    (let (quote ($v $b)) (sealed () (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
 
 ; For lambda without any input
 (: lambda0 (-> Atom (-> $t)))
@@ -28,13 +27,13 @@
 ; For lambda with two inputs
 (: lambda2 (-> Variable Variable Atom (-> $a $b $t)))
 (= ((lambda2 $var1 $var2 $body) $val1 $val2)
-    (let (quote ($v1 $v2 $b)) (sealed ($var1 $var2) (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
+    (let (quote ($v1 $v2 $b)) (sealed () (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
 
 ; For lambda with three inputs. But actually we will use it to bypass recursive limitation while
 ; defining function using let
 (: lambda3 (-> Variable Variable Variable Atom (-> $a $b $c $t)))
 (= ((lambda3 $var1 $var2 $var3 $body) $val1 $val2 $val3)
-    (let (quote ($v1 $v2 $v3 $b)) (sealed ($var1 $var2 $var3) (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
+    (let (quote ($v1 $v2 $v3 $b)) (sealed () (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
 
 ; Sum from $a to $b with pre-defined transition from $a to $(a+1) $next and function $term applied to $a
 (= (sum $term $a $next $b)
@@ -65,13 +64,13 @@
   (sum-integers 1 10)
   55)
 
-(= (pi-sum $a $b) (sum (lambda1 $x (/ 1.0 (* $x (+ $x 2)))) $a (lambda1 $x (+ $x 4)) $b))
+(= (pi-sum $a $b) (sum (lambda1 $x (/ 1.0 (* $x (+ $x 2)))) $a (lambda1 $x (+ $x 4.0)) $b))
 
 ; To get more precise pi-value we need more iterations (in SICP book 1000 is used). But metta is currently slower than
 ; scheme so in sake of performance let ~3.10 be our pi-value
 
 !(assertEqual
-  (* 8 (pi-sum 1 50))
+  (* 8 (pi-sum 1.0 50.0))
   3.1031453128860114)
 
 (= (integral $f $a $b $dx)
@@ -110,7 +109,7 @@
                                                 (* 2 (sum $element-y 2 inc2 (dec $n))))) 3))))
 
 !(assertEqual
-    (integral-simpson cube 0 1 10)
+    (integral-simpson cube 0.0 1.0 10.0)
     0.25)
 
 ; -----------------------End of Exercise 1.29----------------------------
@@ -185,8 +184,8 @@
 (= (jw_pivalue $n)
     (let $next_divident-element (lambda1 $x (* (* 2 $x) (* 2 (inc $x))))
         (let $next_divisor-element (lambda1 $y (sqr (inc (* 2 $y))))
-            (* 4 (/ (iproduct $next_divident-element 1 inc $n)
-                        (iproduct $next_divisor-element 1 inc $n))))))
+            (* 4 (/ (iproduct $next_divident-element 1.0 inc $n)
+                        (iproduct $next_divisor-element 1.0 inc $n))))))
 
 ; In sake of performance we will use only 5 iters to calculate pi-value
 !(assertEqual
@@ -230,11 +229,11 @@
 (= (racc-sum $term $a $next $b) (raccumulate + 0 $term $a $next $b))
 (= (iacc-sum $term $a $next $b) (iaccumulate + 0 $term $a $next $b))
 
-(= (pi-raccsum $a $b) (let $pi-term (lambda1 $x (/ 1 (* $x (inc2 $x))))
+(= (pi-raccsum $a $b) (let $pi-term (lambda1 $x (/ 1.0 (* $x (inc2 $x))))
                         (let $pi-next (lambda1 $y (+ $y 4))
                             (racc-sum $pi-term $a $pi-next $b))))
 
-(= (pi-iaccsum $a $b) (let $pi-term (lambda1 $x (/ 1 (* $x (inc2 $x))))
+(= (pi-iaccsum $a $b) (let $pi-term (lambda1 $x (/ 1.0 (* $x (inc2 $x))))
                         (let $pi-next (lambda1 $y (+ $y 4))
                             (iacc-sum $pi-term $a $pi-next $b))))
 
@@ -316,7 +315,7 @@
     112112)
 ; -----------------------End of Exercise 1.33----------------------------
 
-(= (average $a $b) (/ (+ $a $b) 2))
+(= (average $a $b) (/ (+ $a $b) 2.0))
 
 (= (negative? $x) (< $x 0))
 (= (positive? $x) (> $x 0))
@@ -414,7 +413,7 @@
     ($rec 0 $rec)))
 
 !(assertEqual
-    (finite_continued_fraction (lambda1 $x 1) (lambda1 $x 1) 10)
+    (finite_continued_fraction (lambda1 $x 1.0) (lambda1 $x 1.0) 10.0)
     0.6180555555555556)
 
 ; Iterative
@@ -429,7 +428,7 @@
     ($iter $k 0 $iter)))
 
 !(assertEqual
-    (ifinite_continued_fraction (lambda1 $x 1) (lambda1 $x 1) 10)
+    (ifinite_continued_fraction (lambda1 $x 1.0) (lambda1 $x 1.0) 10)
     0.6180555555555556)
 ; -----------------------End of Exercise 1.37----------------------------
 
@@ -448,7 +447,7 @@
     (let $n (lambda1 $a 1)
         (let $d (lambda1 $a2
                         (if (== (remainder $a2 3) 1)
-                                            (* 2 (inc (incomplete_partial $a2 3)))
+                                            (* 2 (inc (incomplete_partial $a2 3.0)))
                                             1))
         (+ 2 (finite_continued_fraction $n $d $k)))))
 
@@ -499,7 +498,7 @@
   (finite_continued_fraction $n (lambda1 $a2 (inc (* 2 $a2))) $k)))
 
 !(assertEqual
-    (tan-cf 1 10)
+    (tan-cf 1.0 10.0)
     1.557407724654902)
 
 ; -----------------------End of Exercise 1.39----------------------------

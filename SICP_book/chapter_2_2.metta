@@ -281,7 +281,7 @@
 
 (: lambda1 (-> Variable Atom (-> $a $t)))
 (= ((lambda1 $var $body) $val)
-    (let (quote ($v $b)) (sealed ($var) (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
+    (let (quote ($v $b)) (sealed () (quote ($var $body))) (let (quote $v) (quote $val) $b)) )
 
 (= (square $x)
     (* $x $x))
@@ -806,7 +806,7 @@
 
 (: lambda2 (-> Variable Variable Atom (-> $a $b $t)))
 (= ((lambda2 $var1 $var2 $body) $val1 $val2)
-    (let (quote ($v1 $v2 $b)) (sealed ($var1 $var2) (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
+    (let (quote ($v1 $v2 $b)) (sealed () (quote ($var1 $var2 $body))) (let (quote ($v1 $v2)) (quote ($val1 $val2)) $b)) )
 
 (= (acc-map $p $sequence)
   (accumulate (lambda2 $x $y (Cons ($p $x) $y)) Nil $sequence))
@@ -995,7 +995,7 @@
 
 (: lambda3 (-> Variable Variable Variable Atom (-> $a $b $c $t)))
 (= ((lambda3 $var1 $var2 $var3 $body) $val1 $val2 $val3)
-    (let (quote ($v1 $v2 $v3 $b)) (sealed ($var1 $var2 $var3) (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
+    (let (quote ($v1 $v2 $v3 $b)) (sealed () (quote ($var1 $var2 $var3 $body))) (let (quote ($v1 $v2 $v3)) (quote ($val1 $val2 $val3)) $b)) )
 
 (= (fold-left $op $initial $sequence)
   (let $iter (lambda3 $result $rest $self
