@@ -1,9 +1,9 @@
 ; Attention-gated inheritance cycle.
 ; Requires: pip install hyperon-ecan[hyperon]
-; Then:     metta-py ecan/concept_attention.metta
+; Then:     metta ecan/concept_attention.metta
 ;
-; Grounded atoms live in hyperon_ecan.ext of
-; https://github.com/aljojoby9/hyperon-ecan
+; Grounded atoms are registered by importing hyperon_ecan
+; (see hyperon_ecan/ext.py in https://github.com/aljojoby9/hyperon-ecan).
 
 !(import! &self hyperon_ecan)
 
