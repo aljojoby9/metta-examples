@@ -1,33 +1,27 @@
 # ECAN + neural spreading
 
 Example of [hyperon-ecan](https://github.com/aljojoby9/hyperon-ecan)
-from MeTTa. The library lives in that repo. This folder is just the
-usage sketch.
+from MeTTa. The library is in that repo. This folder is just the sketch.
 
 ## Run
 
 ```bash
-pip install git+https://github.com/aljojoby9/hyperon-ecan.git#egg=hyperon-ecan[hyperon]
+pip install "hyperon-ecan[hyperon] @ git+https://github.com/aljojoby9/hyperon-ecan.git"
 metta ecan/concept_attention.metta
 ```
 
-## What the script does
+Use a current checkout. Older versions don't have `ecan-cluster` / `ecan-report`.
 
-It walks the same loop one call at a time, so you can see each ECAN
-op instead of a single `ecan-tick` blob.
+## What you should see
 
-1. `ecan-fact` — add Inheritance triples (also builds Hebbian links)
-2. `ecan-add wolf` — wolf has no symbolic edge
-3. `ecan-cluster` — put dog/wolf in one embedding group, oak/tree in another
-4. `ecan-focus` / `ecan-sti` — working memory starts empty
-5. `ecan-stimulate dog` then `ecan-cycle` — pay attention, spread STI
-6. `neural-similar` / `ecan-sti wolf` / `ecan-sti oak` — wolf should
-   move, oak should stay near 0
-7. `ecan-infer` — should print `(Inheritance dog animal)`, not oak
+`ecan-report` prints one line of `name: sti=… focus|idle`.
 
-Python experiments with more detail are in the library repo:
+1. After setup, everything is `sti=0.00 idle`.
+2. After `!(ecan-stimulate dog 20)` and `!(ecan-cycle)`:
+   - `dog` is in focus (STI stays above 8)
+   - `wolf` has some STI, `oak` stays `0.00 idle`
+3. `!(neural-similar dog)` lists mammal/wolf first
+4. `!(ecan-infer)` returns `(Inheritance dog animal)`
 
-```bash
-python examples/associative_memory.py
-python examples/attention_gated_inference.py
-```
+12 is not enough. After rent, dog drops below the focus cutoff and
+`ecan-infer` returns `none`. The script uses 20 on purpose.
