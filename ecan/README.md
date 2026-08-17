@@ -1,53 +1,33 @@
 # ECAN + neural spreading
 
-Economic Attention Networks for Hyperon. Classic OpenCog had this.
-Hyperon does not. The full implementation, tests, and the two experiments
-live in a sibling-style repo:
+Example of [hyperon-ecan](https://github.com/aljojoby9/hyperon-ecan)
+from MeTTa. The library lives in that repo. This folder is just the
+usage sketch.
 
-**https://github.com/aljojoby9/hyperon-ecan**
-
-This folder is the in-tree hook: a MeTTa sketch plus the reason the
-example exists.
-
-## Why this is here
-
-The Hyperon paper (arXiv:2310.18318) lists PLN, MOSES and ECAN as the
-cognitive algorithms that should come back as MeTTa. PLN has
-`trueagi-io/PLN`. ECAN has nothing. Classic `opencog/attention` is
-marked obsolete.
-
-`hyperon-ecan` implements Iklé, Pitt, Goertzel & Sellman 2009
-Variant 1 (STI/LTI currencies, rent, wages, Hebbian, left-stochastic
-diffusion, forgetting) and adds one thing Classic never had: implicit
-Hebbian weights from embeddings. Attention can move from `dog` to
-`wolf` with no symbolic `Inheritance` edge.
-
-It also runs the PLN/ECAN interlock from the last section of that
-paper: pick the next inference step by STI, pay those atoms, cycle
-ECAN, repeat.
-
-This is not MeTTa-Motto. No LLM is required on the default path.
-
-## Run the experiments (from the full repo)
+## Run
 
 ```bash
-git clone https://github.com/aljojoby9/hyperon-ecan.git
-cd hyperon-ecan
-python -m pip install -e ".[dev]"
-python examples/associative_memory.py
-python examples/attention_gated_inference.py
-python -m pytest
+pip install git+https://github.com/aljojoby9/hyperon-ecan.git#egg=hyperon-ecan[hyperon]
+metta ecan/concept_attention.metta
 ```
 
-What you should see:
+## What the script does
 
-- Imprint `{dog, bark, leash, park}`, decay, cue `{dog, bark}` → the
-  rest of the pattern re-enters the attentional focus. Distractors stay
-  out.
-- Prove `(Inheritance dog animal)` without expanding an oak/tree/plant
-  subgraph that sits in the same space. `wolf` gets STI; `oak` does not.
+It walks the same loop one call at a time, so you can see each ECAN
+op instead of a single `ecan-tick` blob.
 
-## MeTTa façade
+1. `ecan-fact` — add Inheritance triples (also builds Hebbian links)
+2. `ecan-add wolf` — wolf has no symbolic edge
+3. `ecan-cluster` — put dog/wolf in one embedding group, oak/tree in another
+4. `ecan-focus` / `ecan-sti` — working memory starts empty
+5. `ecan-stimulate dog` then `ecan-cycle` — pay attention, spread STI
+6. `neural-similar` / `ecan-sti wolf` / `ecan-sti oak` — wolf should
+   move, oak should stay near 0
+7. `ecan-infer` — should print `(Inheritance dog animal)`, not oak
 
-`concept_attention.metta` drives the Python grounded atoms. Needs
-`pip install hyperon-ecan[hyperon]`.
+Python experiments with more detail are in the library repo:
+
+```bash
+python examples/associative_memory.py
+python examples/attention_gated_inference.py
+```
